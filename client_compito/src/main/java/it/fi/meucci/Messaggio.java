@@ -4,25 +4,28 @@ import java.util.ArrayList;
 
 public class Messaggio
 {
-    ArrayList <Biglietti> Lista_biglietti = new ArrayList<>();
+    ArrayList <Biglietti> listaBiglietti = new ArrayList<>();
 
     public Messaggio(ArrayList<Biglietti> lista_biglietti) 
     {
-        Lista_biglietti = lista_biglietti;
+        this.listaBiglietti = lista_biglietti;
     }
 
     public Messaggio() {}
 
-    public ArrayList<Biglietti> getLista_biglietti() {
-        return Lista_biglietti;
+    public ArrayList<Biglietti> getListaBiglietti() {
+        return listaBiglietti;
     }
 
-    public void setLista_biglietti(ArrayList<Biglietti> lista_biglietti) {
-        Lista_biglietti = lista_biglietti;
+    public void setListaBiglietti(ArrayList<Biglietti> listaBiglietti) {
+        this.listaBiglietti = listaBiglietti;
     }
 
     @Override
     public String toString() {
-        return "Messaggio [Lista_biglietti=" + Lista_biglietti + "]";
+        return "Messaggio [listaBiglietti=" + listaBiglietti + "]";
     }
+
+
+
 }

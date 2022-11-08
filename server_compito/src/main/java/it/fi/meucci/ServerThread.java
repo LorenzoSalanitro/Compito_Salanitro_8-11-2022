@@ -5,6 +5,9 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ServerThread extends Thread
 {
@@ -36,33 +39,40 @@ public class ServerThread extends Thread
     {
         inputFromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
         outputToClient = new DataOutputStream(client.getOutputStream());
+        
+        ObjectMapper mapper = new ObjectMapper();
 
-        for(;;)
+        while(true)
         {
             stringRecived = inputFromClient.readLine();
-            if(stringRecived == null || stringRecived.equals("fine"))
+            Messaggio mess = mapper.readValue(stringRecived, Messaggio.class);
+            
+            if (mess.getListaBiglietti().size() == 0) 
             {
-                outputToClient.writeBytes(stringRecived + "server closing" + '\n');
-                System.out.println("Echo on server closing: " + stringRecived);
-                break;
-            }
-            else if(stringRecived.equals("CLOSE"))
-            {
-                MultiServer.spegni();
-                server.close();
-                break;
+                Messaggio nuovo = new Messaggio(MultiServer.LS_biglietti);
+                outputToClient.writeBytes(mapper.writeValueAsString(nuovo) + '\n');
             }
             else
             {
-                outputToClient.writeBytes("received: " + stringRecived + '\n');
-                System.out.println("Echo on server: " + stringRecived);
+                ArrayList <Biglietti> biglietti_presi = new ArrayList<>();
+
+                for (int i = 0; i < mess.getListaBiglietti().size(); i++) 
+                {
+                    for (int j = 0; j < MultiServer.LS_biglietti.size(); j++) 
+                    {
+                        if (mess.getListaBiglietti().get(i).getID() == MultiServer.LS_biglietti.get(j).getID()) 
+                        {
+                            biglietti_presi.add(mess.getListaBiglietti().get(i));
+                            MultiServer.LS_biglietti.remove(j);
+                            j--;
+                        }
+                    }
+                }
+                Messaggio manda = new Messaggio(biglietti_presi);
+                outputToClient.writeBytes(mapper.writeValueAsString(manda) + '\n');
             }
+
+           
         }
-
-        outputToClient.close();
-        inputFromClient.close();
-
-        System.out.println("closing socket" + client);
-        client.close();
     }
 }
